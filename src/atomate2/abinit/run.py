@@ -3,6 +3,7 @@
 from __future__ import annotations
 
 import logging
+import shlex
 import subprocess
 import time
 
@@ -33,8 +34,12 @@ def run_abinit(
     """Run ABINIT."""
     abinit_cmd = abinit_cmd or SETTINGS.ABINIT_CMD
     mpirun_cmd = mpirun_cmd or SETTINGS.ABINIT_MPIRUN_CMD
+    # Split mpirun_cmd to allow for options to the cmd
+    split_mpirun_cmd = shlex.split(mpirun_cmd) if mpirun_cmd else None
+
     start_time = start_time or time.time()
-    command = [mpirun_cmd, abinit_cmd] if mpirun_cmd is not None else [abinit_cmd]
+    command = split_mpirun_cmd if split_mpirun_cmd is not None else []
+    command.append(abinit_cmd)
 
     max_end_time = 0.0
     if wall_time is not None:
